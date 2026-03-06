@@ -13,12 +13,52 @@
       "k": 10, "epsilon": 0.01, "max_iter": 50, "sigma": 0.2
     },
     {
+      "image_func": "coffee", "name": "Coffee_Low_Detail",
+      "k": 2, "epsilon": 0.01, "max_iter": 30, "sigma": 1.0
+    },
+    {
       "image_func": "coffee", "name": "Coffee_Standard",
       "k": 3, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
     },
     {
       "image_func": "coffee", "name": "Coffee_Granular",
       "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "brick", "name": "Brick_Low_Detail",
+      "k": 3, "epsilon": 0.01, "max_iter": 30, "sigma": 1.2
+    },
+    {
+      "image_func": "brick", "name": "Brick_Standard",
+      "k": 6, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "brick", "name": "Brick_High_Detail",
+      "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.2
+    },
+    {
+      "image_func": "grass", "name": "Grass_Smoothed",
+      "k": 4, "epsilon": 0.01, "max_iter": 40, "sigma": 1.5
+    },
+    {
+      "image_func": "grass", "name": "Grass_Standard",
+      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "grass", "name": "Grass_High_Texture",
+      "k": 15, "epsilon": 0.01, "max_iter": 60, "sigma": 0.2
+    },
+    {
+      "image_func": "hubble_deep_field", "name": "Hubble_Summary",
+      "k": 5, "epsilon": 0.01, "max_iter": 40, "sigma": 1.0
+    },
+    {
+      "image_func": "hubble_deep_field", "name": "Hubble_Standard",
+      "k": 10, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "hubble_deep_field", "name": "Hubble_Complex",
+      "k": 25, "epsilon": 0.005, "max_iter": 100, "sigma": 0.2
     },
     {
       "image_func": "chelsea", "name": "Cat_Smoothed",

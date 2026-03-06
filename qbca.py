@@ -89,14 +89,24 @@ class QBCA:
         return [i for i in seed_indices if d_min(self.seeds[i]) <= d_star_max]
 
     def cci(self, P):
-        """Step 2: Cluster center initialization."""
+        """Step 2: Cluster center initialization using density peaks."""
+        # 1. Count points in bins and sort by density [cite: 261, 288]
         bin_counts = {bid: len(indices) for bid, indices in self.bins.items()}
         sorted_bins = sorted(bin_counts.keys(), key=lambda x: bin_counts[x], reverse=True)
 
         seed_list = []
+
+        # 2. Paper Logic: Find local density peaks [cite: 291, 301]
         for bid in sorted_bins:
             if len(seed_list) < self.k:
                 seed_list.append(P[self.bins[bid]].mean(axis=0))
+
+        if len(seed_list) < self.k:
+            # If we have NO bins, use random points; otherwise, duplicate densest
+            padding_needed = self.k - len(seed_list)
+            for i in range(padding_needed):
+                seed_list.append(seed_list[i % len(seed_list)])
+
         self.seeds = np.array(seed_list)
 
     def cca(self, P):
