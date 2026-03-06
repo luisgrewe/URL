@@ -36,7 +36,9 @@ To activate your environment, run the following comand:
 ---
 
 ### Testing Docstring
-`uv run flake8 qbca.py --config .flake8 || uv run python -m flake8 qbca.py --config .flake8`
+```bash
+uv run flake8 qbca.py --config .flake8 || uv run python -m flake8 qbca.py --config .flake8
+```
 
 ## Linting (Flake8 via uv)
 
