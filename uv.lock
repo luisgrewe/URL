@@ -870,6 +870,7 @@ name = "url"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "autopep8" },
     { name = "flake8" },
     { name = "flake8-bugbear" },
     { name = "flake8-docstrings" },
@@ -882,6 +883,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "autopep8", specifier = ">=2.3.2" },
     { name = "flake8", specifier = ">=7.3.0" },
     { name = "flake8-bugbear", specifier = ">=25.11.29" },
     { name = "flake8-docstrings", specifier = ">=1.7.0" },

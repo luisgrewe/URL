@@ -42,7 +42,7 @@ uv add nbqa
 
 - Run Flake8 on a notebook (checks code cells using your `.flake8`):
 ```bash
-uv run nbqa flake8 path/to/notebook.ipynb --config .flake8
+uv run nbqa flake8 main_analysis.ipynb --config .flake8
 ```
 
 - Autoformat or fixable issues: run an autoformatter via `nbqa`, for example:
