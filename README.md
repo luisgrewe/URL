@@ -3,7 +3,7 @@
 ## Getting Started
 
 1. **Clone the repository**:
-   `git clone https://github.com/luisgrewe/StockSalesPrediction.git`
+   `git clone https://github.com/luisgrewe/URL.git`
 
 2. **Be aware of the location of your input data**:
    Locate the train and test sets in a simple `data` folder.
