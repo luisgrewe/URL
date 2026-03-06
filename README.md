@@ -1,5 +1,43 @@
 # URL
 
+## Getting Started
+
+1. **Clone the repository**:
+   `git clone https://github.com/luisgrewe/StockSalesPrediction.git`
+
+2. **Be aware of the location of your input data**:
+   Locate the train and test sets in a simple `data` folder.
+
+## Package Management with `uv`
+
+This project uses [uv](https://docs.astral.sh/uv/) for high-performance dependency management. Below are the essential commands to get the environment running.
+
+### Installation
+If you don't have `uv` installed, run the following command for your OS:
+
+| Platform | Command |
+| :--- | :--- |
+| **macOS/Linux** | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| **Windows** | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
+
+---
+
+### Environment Setup
+Once `uv` is installed, navigate to the project root and run:
+
+```bash
+# Initialize the project, create .venv, and install dependencies
+uv sync
+```
+To activate your environment, run the following comand:
+
+| Platform | Activation Command |
+| :--- | :--- |
+| **macOS / Linux** | `source .venv/bin/activate` |
+| **Windows (PowerShell)** | `.venv\Scripts\activate` |
+
+---
+
 ### Testing Docstring
 '''uv run flake8 qbca.py --config .flake8 || uv run python -m flake8 qbca.py --config .flake8 '''
 
