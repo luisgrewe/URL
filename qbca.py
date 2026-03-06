@@ -89,28 +89,42 @@ class QBCA:
         return [i for i in seed_indices if d_min(self.seeds[i]) <= d_star_max]
 
     def cci(self, P):
-        """Step 2: Cluster center initialization using density peaks."""
-        # 1. Count points in bins and sort by density [cite: 261, 288]
+        """Step 2: Cluster center initialization with density-based seeding."""
+        # 1. Count points in bins and sort by density
         bin_counts = {bid: len(indices) for bid, indices in self.bins.items()}
-        sorted_bins = sorted(bin_counts.keys(), key=lambda x: bin_counts[x], reverse=True)
+        # Use a list of (bin_id, count) to make tracking easier
+        sorted_bins = sorted(bin_counts.items(), key=lambda x: x[1], reverse=True)
 
         seed_list = []
+        chosen_bins = set()
 
-        # 2. Paper Logic: Find local density peaks [cite: 291, 301]
-        for bid in sorted_bins:
+        # 2. Paper Logic: Find local density peaks [cite: 261, 332]
+        # In a full implementation, you'd check neighbors here [cite: 297, 299]
+        # For this version, we start by adding the densest bins [cite: 301]
+        for bid, _count in sorted_bins:
             if len(seed_list) < self.k:
                 seed_list.append(P[self.bins[bid]].mean(axis=0))
+                chosen_bins.add(bid)
 
+        # 3. CRITICAL FIX: The "Top-up" stage
+        # If the number of peak bins is less than k, select from remaining bins
         if len(seed_list) < self.k:
-            # If we have NO bins, use random points; otherwise, duplicate densest
-            padding_needed = self.k - len(seed_list)
-            for i in range(padding_needed):
-                seed_list.append(seed_list[i % len(seed_list)])
+            remaining_bins = [bid for bid, count in sorted_bins if bid not in chosen_bins]
+            for bid in remaining_bins:
+                if len(seed_list) < self.k:
+                    seed_list.append(P[self.bins[bid]].mean(axis=0))
+                    chosen_bins.add(bid)
+
+        # 4. Final Safety: If k is still larger than non-empty bins, pad with random noise
+        # This prevents the IndexError when k > number of non-empty bins
+        while len(seed_list) < self.k:
+            random_idx = np.random.randint(0, P.shape[0])
+            seed_list.append(P[random_idx])
 
         self.seeds = np.array(seed_list)
 
     def cca(self, P):
-        """Step 3: Cluster center assignment (CCA) with early pruning [cite: 353, 487]."""
+        """Step 3: Cluster center assignment with early pruning."""
         new_assignments = np.zeros(P.shape[0], dtype=int)
         all_seed_indices = list(range(self.k))
 

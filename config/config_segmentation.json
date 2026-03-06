@@ -1,6 +1,18 @@
 {
   "experiments": [
     {
+      "image_func": "moon", "name": "Moon_Summary",
+      "k": 3, "epsilon": 0.01, "max_iter": 40, "sigma": 1.0
+    },
+    {
+      "image_func": "moon", "name": "Moon_Standard",
+      "k": 5, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "moon", "name": "Moon_High_Contrast",
+      "k": 8, "epsilon": 0.005, "max_iter": 60, "sigma": 0.2
+    },
+    {
       "image_func": "astronaut", "name": "Astronaut_Detail_Low",
       "k": 3, "epsilon": 0.01, "max_iter": 50, "sigma": 1.0
     },
@@ -22,19 +34,7 @@
     },
     {
       "image_func": "coffee", "name": "Coffee_Granular",
-      "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
-    },
-    {
-      "image_func": "brick", "name": "Brick_Low_Detail",
-      "k": 3, "epsilon": 0.01, "max_iter": 30, "sigma": 1.2
-    },
-    {
-      "image_func": "brick", "name": "Brick_Standard",
-      "k": 6, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
-    },
-    {
-      "image_func": "brick", "name": "Brick_High_Detail",
-      "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.2
+      "k": 6, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
     },
     {
       "image_func": "grass", "name": "Grass_Smoothed",
@@ -42,43 +42,59 @@
     },
     {
       "image_func": "grass", "name": "Grass_Standard",
-      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+      "k": 6, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
     },
     {
-      "image_func": "grass", "name": "Grass_High_Texture",
-      "k": 15, "epsilon": 0.01, "max_iter": 60, "sigma": 0.2
-    },
-    {
-      "image_func": "hubble_deep_field", "name": "Hubble_Summary",
-      "k": 5, "epsilon": 0.01, "max_iter": 40, "sigma": 1.0
-    },
-    {
-      "image_func": "hubble_deep_field", "name": "Hubble_Standard",
-      "k": 10, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
-    },
-    {
-      "image_func": "hubble_deep_field", "name": "Hubble_Complex",
-      "k": 25, "epsilon": 0.005, "max_iter": 100, "sigma": 0.2
+      "image_func": "grass", "name": "Grass_Texture",
+      "k": 8, "epsilon": 0.01, "max_iter": 60, "sigma": 0.2
     },
     {
       "image_func": "chelsea", "name": "Cat_Smoothed",
       "k": 5, "epsilon": 0.01, "max_iter": 50, "sigma": 1.5
     },
     {
+      "image_func": "chelsea", "name": "Cat_Standard",
+      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
       "image_func": "chelsea", "name": "Cat_Detailed",
-      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
+      "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
+    },
+    {
+      "image_func": "rocket", "name": "Rocket_Summary",
+      "k": 3, "epsilon": 0.01, "max_iter": 30, "sigma": 1.0
+    },
+    {
+      "image_func": "rocket", "name": "Rocket_Standard",
+      "k": 6, "epsilon": 0.01, "max_iter": 60, "sigma": 0.5
     },
     {
       "image_func": "rocket", "name": "Rocket_High_K",
-      "k": 15, "epsilon": 0.01, "max_iter": 60, "sigma": 0.4
+      "k": 10, "epsilon": 0.01, "max_iter": 60, "sigma": 0.3
     },
     {
-      "image_func": "camera", "name": "Camera_Monochrome",
+      "image_func": "camera", "name": "Camera_Low_Detail",
+      "k": 3, "epsilon": 0.01, "max_iter": 30, "sigma": 1.0
+    },
+    {
+      "image_func": "camera", "name": "Camera_Standard",
       "k": 4, "epsilon": 0.01, "max_iter": 30, "sigma": 0.6
     },
     {
-      "image_func": "coins", "name": "Coins_Binary_Test",
+      "image_func": "camera", "name": "Camera_High_Detail",
+      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
+    },
+    {
+      "image_func": "coins", "name": "Coins_Binary",
       "k": 2, "epsilon": 0.005, "max_iter": 40, "sigma": 1.0
+    },
+    {
+      "image_func": "coins", "name": "Coins_Standard",
+      "k": 4, "epsilon": 0.01, "max_iter": 40, "sigma": 0.5
+    },
+    {
+      "image_func": "coins", "name": "Coins_Detailed",
+      "k": 7, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
     }
   ]
 }
