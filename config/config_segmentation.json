@@ -1,0 +1,39 @@
+{
+  "experiments": [
+    {
+      "image_func": "astronaut",
+      "name": "Astronaut_Detail_Low",
+      "k": 3, "epsilon": 0.01, "max_iter": 50, "sigma": 1.0
+    },
+    {
+      "image_func": "astronaut",
+      "name": "Astronaut_Detail_Standard",
+      "k": 5, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "astronaut",
+      "name": "Astronaut_Detail_High",
+      "k": 10, "epsilon": 0.01, "max_iter": 50, "sigma": 0.2
+    },
+    {
+      "image_func": "coffee",
+      "name": "Coffee_Standard",
+      "k": 3, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "coffee",
+      "name": "Coffee_OverSegmented",
+      "k": 12, "epsilon": 0.01, "max_iter": 50, "sigma": 0.5
+    },
+    {
+      "image_func": "chelsea",
+      "name": "Cat_Smoothed",
+      "k": 5, "epsilon": 0.01, "max_iter": 50, "sigma": 1.5
+    },
+    {
+      "image_func": "chelsea",
+      "name": "Cat_Detailed",
+      "k": 8, "epsilon": 0.01, "max_iter": 50, "sigma": 0.3
+    }
+  ]
+}
