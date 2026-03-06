@@ -31,6 +31,8 @@ Notes:
 - The repo-level `.flake8` controls rules such as blank-line enforcement and docstring checks.
 - To suppress a specific check for a file temporarily, use a `# noqa: CODE` comment or add a `per-file-ignores` entry in `.flake8`.
 
+- Quick reference: see `FLAKE8-CHEATSHEET.md` for common codes and fixes.
+
 ### Linting notebooks (ipynb)
 
 - Install `nbqa` into the `uv` environment:
