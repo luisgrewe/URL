@@ -5,9 +5,6 @@
 1. **Clone the repository**:
    `git clone https://github.com/luisgrewe/URL.git`
 
-2. **Be aware of the location of your input data**:
-   Locate the train and test sets in a simple `data` folder.
-
 ## Package Management with `uv`
 
 This project uses [uv](https://docs.astral.sh/uv/) for high-performance dependency management. Below are the essential commands to get the environment running.
