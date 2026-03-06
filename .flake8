@@ -1,0 +1,13 @@
+[flake8]
+# Basic, practical configuration for this repo
+max-line-length = 90
+
+# Ignore a few rules that conflict with common formatters (do not disable
+# blank-line rules E301/E302/E303 so spacing around classes/functions is enforced)
+extend-ignore = E203, W503
+
+# Paths to exclude from linting
+exclude = .venv, venv, build, dist, .git, __pycache__, .mypy_cache
+
+# Enable common checks and docstring checks (requires flake8-docstrings)
+select = C,E,F,W,B,D
