@@ -11,7 +11,7 @@ class QBCA:
     Ref: Yu & Wong (2010), Pattern Recognition 43. [cite: 2].
     """
 
-    def __init__(self, k, threshold=0.01, max_iter=50):
+    def __init__(self, k, threshold=0.0001, max_iter=50):
         """Initialize a QBCA instance with clustering parameters."""
         self.k = k
         self.threshold = threshold
@@ -21,48 +21,62 @@ class QBCA:
         self.bin_bounds = {}
         self.parents = {}
 
-        # Metric tracking [cite: 563]
+        # Metric tracking
         self.init_time = 0
         self.total_dist_calls = 0
         self.iterations = 0
 
     def quantization(self, P):
-        """Step 1: The quantization process & Hierarchical Construction [cite: 218, 483]."""
+        """Step 1: Fully Vectorized Quantization & Hierarchical Construction."""
         n, m = P.shape
-        # Calculate rho (Equation 19) [cite: 220]
         self.rho = int(np.floor(np.log(n) / np.log(m))) if m > 1 else int(np.sqrt(n))
 
         p_min, p_max = P.min(axis=0), P.max(axis=0)
         bin_widths = (p_max - p_min) / self.rho
         bin_widths[bin_widths == 0] = 1.0
 
+        # 1. Vectorized Bin Assignment
+        xi = np.floor((P - p_min) / bin_widths).astype(int)
+        xi = np.clip(xi, 0, self.rho - 1)
+
+        # 2. Vectorized Linearization
+        powers = self.rho ** np.arange(m - 1, -1, -1)
+        bin_ids = np.dot(xi, powers)
+
+        # 3. Fast Grouping using argsort (No Python point loops!)
+        sort_idx = np.argsort(bin_ids)
+        sorted_bin_ids = bin_ids[sort_idx]
+
+        # Find where the bin IDs change to split the array
+        _, unique_indices = np.unique(sorted_bin_ids, return_index=True)
+        split_indices = unique_indices[1:]
+        indices_per_bin = np.split(sort_idx, split_indices)
+        unique_bin_ids = sorted_bin_ids[unique_indices]
+
         self.bins = defaultdict(list)
-        self.parents = defaultdict(lambda: {'children': set(), 'bounds': [None, None]})
-
-        # Quantization and parent mapping [cite: 227, 494]
-        for i, point in enumerate(P):
-            xi = np.floor((point - p_min) / bin_widths).astype(int)
-            xi = np.clip(xi, 0, self.rho - 1)
-
-            # Linearize bin index (Equation 21) [cite: 227]
-            bin_id = 0
-            for dim in range(m):
-                bin_id += xi[dim] * (self.rho ** (m - 1 - dim))
-            self.bins[bin_id].append(i)
-
-            # Define hierarchical structure (Section 6) [cite: 483, 494]
-            parent_xi = xi // 2
-            parent_id = 0
-            for dim in range(m):
-                parent_id += parent_xi[dim] * ((self.rho // 2 + 1) ** (m - 1 - dim))
-            self.parents[parent_id]['children'].add(bin_id)
-
-        # Shrinking process for child bins (Equation 27) [cite: 476, 478]
-        for bid, indices in self.bins.items():
+        for bid, indices in zip(unique_bin_ids, indices_per_bin):
+            self.bins[bid] = indices.tolist()
+            # Child shrinking bounds computed instantly
             pts = P[indices]
             self.bin_bounds[bid] = (pts.min(axis=0), pts.max(axis=0))
 
-        # Shrinking process for parents (Lemma 4) [cite: 522, 528]
+        # 4. Hierarchical Construction (ONLY on unique bins)
+        self.parents = defaultdict(lambda: {'children': set(), 'bounds': [None, None]})
+        parent_powers = (self.rho // 2 + 1) ** np.arange(m - 1, -1, -1)
+
+        for bid in unique_bin_ids:
+            # Reconstruct xi coordinates
+            temp_id = bid
+            xi_coords = []
+            for p in powers:
+                xi_coords.append(temp_id // p)
+                temp_id %= p
+
+            parent_xi = np.array(xi_coords) // 2
+            parent_id = np.dot(parent_xi, parent_powers)
+            self.parents[parent_id]['children'].add(bid)
+
+        # 5. Shrinking process for parents
         for _pid, data in self.parents.items():
             child_mins = [self.bin_bounds[cid][0] for cid in data['children']]
             child_maxes = [self.bin_bounds[cid][1] for cid in data['children']]
@@ -72,20 +86,22 @@ class QBCA:
         """Determine seed candidates based on hierarchical bounds and distance bounds."""
         b_min, b_max = bounds
 
-        # Minimum distance lower bound (Equation 10) [cite: 174]
+        # Minimum distance lower bound
         def d_min(s):
+            self.total_dist_calls += 1
             closest = np.where(s < b_min, b_min, np.where(s > b_max, b_max, s))
             return np.linalg.norm(s - closest)
 
-        # Maximum distance upper bound (Equation 12) [cite: 177]
+        # Maximum distance upper bound
         def d_max(s):
+            self.total_dist_calls += 1
             furthest = np.where(s >= (b_min + b_max) / 2, b_min, b_max)
             return np.linalg.norm(s - furthest)
 
-        # Find the min of max distances (Equation 15) [cite: 192]
+        # Find the min of max distances
         d_star_max = min(d_max(self.seeds[i]) for i in seed_indices)
 
-        # Lemma 1 filter: Reject seeds further than d* [cite: 188, 780]
+        # Lemma 1 filter: Reject seeds further than d*
         return [i for i in seed_indices if d_min(self.seeds[i]) <= d_star_max]
 
     def cci(self, P):
@@ -156,27 +172,25 @@ class QBCA:
         if self.k < 2:
             return 0
 
-        # Inter-cluster distance (Equation 24) [cite: 415]
+        # Inter-cluster distance
         inter_dist = float('inf')
         for i in range(self.k):
             for j in range(i + 1, self.k):
-                pts_i = P[assignments == i]
-                pts_j = P[assignments == j]
-                if len(pts_i) == 0 or len(pts_j) == 0:
-                    continue
-                # Approximation: Distance between centers for performance
                 dist = np.linalg.norm(self.seeds[i] - self.seeds[j])
                 if dist < inter_dist:
                     inter_dist = dist
 
-        # Intra-cluster diameter (Equation 25) [cite: 416]
+        # Intra-cluster diameter (Fast Approximation)
         max_diam = 0
         for i in range(self.k):
+            # Boolean indexing is faster
             pts = P[assignments == i]
             if len(pts) == 0:
                 continue
-            # Approximation: Max distance from center
-            diam = np.max(np.linalg.norm(pts - self.seeds[i], axis=1)) * 2
+
+            # Use bounding box diagonal as diameter estimate instead of testing all points
+            c_min, c_max = pts.min(axis=0), pts.max(axis=0)
+            diam = np.linalg.norm(c_max - c_min)
             if diam > max_diam:
                 max_diam = diam
 
@@ -195,17 +209,44 @@ class QBCA:
             old_seeds = self.seeds.copy()
             assignments = self.cca(P)
 
-            # Recompute centers (Equation 8) [cite: 101]
             for h in range(self.k):
                 cluster_pts = P[assignments == h]
                 if len(cluster_pts) > 0:
                     self.seeds[h] = cluster_pts.mean(axis=0)
 
-            # Calculate gap delta (Equations 17-18) [cite: 212]
-            shift = np.mean([np.sum((old_seeds[h] - self.seeds[h])**2) for h in range(self.k)])
+            # VECTORIZED GAP (Equations 17-18)
+            # Calculates the shift for all centroids instantly
+            shift = np.mean(np.sum((old_seeds - self.seeds)**2, axis=1))
+
             history.append({"iteration": t, "shift": shift})
             self.iterations = t + 1
             if shift < self.threshold:
                 break
 
         return assignments, self.seeds, history
+
+    def get_metrics(self, P, assignments):
+        """Calculate evaluation metrics for the QBCA clustering performance.
+
+        Returns:
+            avg_distortion: The average squared distance from points to their cluster centers.
+            avg_dist_comp: The average number of distance computations per point per iteration.
+        """
+        # 1. Calculate Average Distortion (phi)
+        distortion = 0.0
+        for h in range(self.k):
+            cluster_pts = P[assignments == h]
+            if len(cluster_pts) > 0:
+                # Squared Euclidean distance from points to their assigned centroid
+                squared_distances = np.sum((cluster_pts - self.seeds[h])**2, axis=1)
+                distortion += np.sum(squared_distances)
+
+        avg_distortion = distortion / len(P)
+
+        # 2. Calculate Average Distance Computations
+        if self.iterations > 0 and len(P) > 0:
+            avg_dist_comp = self.total_dist_calls / (len(P) * self.iterations)
+        else:
+            avg_dist_comp = 0.0
+
+        return avg_distortion, avg_dist_comp
