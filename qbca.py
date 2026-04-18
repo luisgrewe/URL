@@ -16,6 +16,8 @@ class QBCA:
         self.seeds = None
         self.bins = {}
         self.bin_bounds = {}
+        self.bin_means = {}
+        self.bin_counts = {}
         self.parents = {}
 
         # Metric tracking
@@ -27,6 +29,14 @@ class QBCA:
         """Fully Vectorized Quantization & Hierarchical Construction."""
         n, m = P.shape
         self.rho = int(np.floor(np.log(n) / np.log(m))) if m > 1 else int(np.sqrt(n))
+        self.rho = max(self.rho, 1)
+
+        # Reset per-run cache structures to avoid stale data across repeated fit calls.
+        self.bins = {}
+        self.bin_bounds = {}
+        self.bin_means = {}
+        self.bin_counts = {}
+        self.parents = defaultdict(lambda: {'children': set(), 'bounds': [None, None]})
 
         p_min, p_max = P.min(axis=0), P.max(axis=0)
         bin_widths = (p_max - p_min) / self.rho
@@ -50,28 +60,25 @@ class QBCA:
         indices_per_bin = np.split(sort_idx, split_indices)
         unique_bin_ids = sorted_bin_ids[unique_indices]
 
-        self.bins = defaultdict(list)
         for bid, indices in zip(unique_bin_ids, indices_per_bin):
-            self.bins[bid] = indices.tolist()
+            bid_int = int(bid)
+            self.bins[bid_int] = indices
             # Child shrinking bounds computed instantly
             pts = P[indices]
-            self.bin_bounds[bid] = (pts.min(axis=0), pts.max(axis=0))
+            self.bin_bounds[bid_int] = (pts.min(axis=0), pts.max(axis=0))
+            self.bin_means[bid_int] = pts.mean(axis=0)
+            self.bin_counts[bid_int] = len(indices)
 
         # Hierarchical Construction
-        self.parents = defaultdict(lambda: {'children': set(), 'bounds': [None, None]})
         parent_powers = (self.rho // 2 + 1) ** np.arange(m - 1, -1, -1)
 
-        for bid in unique_bin_ids:
-            # Reconstruct xi coordinates
-            temp_id = bid
-            xi_coords = []
-            for p in powers:
-                xi_coords.append(temp_id // p)
-                temp_id %= p
+        # Decode all coordinates in one pass, then map to parent ids.
+        xi_coords = (unique_bin_ids[:, None] // powers[None, :]) % self.rho
+        parent_xi = xi_coords // 2
+        parent_ids = np.dot(parent_xi, parent_powers)
 
-            parent_xi = np.array(xi_coords) // 2
-            parent_id = np.dot(parent_xi, parent_powers)
-            self.parents[parent_id]['children'].add(bid)
+        for parent_id, bid in zip(parent_ids, unique_bin_ids):
+            self.parents[int(parent_id)]['children'].add(int(bid))
 
         # Shrinking process for parents
         for _pid, data in self.parents.items():
@@ -81,49 +88,41 @@ class QBCA:
 
     def _get_candidates(self, seed_indices, bounds):
         """Determine seed candidates based on hierarchical bounds and distance bounds."""
+        if not seed_indices:
+            return []
+
         b_min, b_max = bounds
+        seeds = self.seeds[seed_indices]
+        midpoint = (b_min + b_max) / 2.0
 
         # Minimum distance lower bound
-        def d_min(s):
-            self.total_dist_calls += 1
-            closest = np.where(s < b_min, b_min, np.where(s > b_max, b_max, s))
-            return np.linalg.norm(s - closest)
+        closest = np.where(seeds < b_min, b_min, np.where(seeds > b_max, b_max, seeds))
+        d_min_vals = np.linalg.norm(seeds - closest, axis=1)
 
         # Maximum distance upper bound
-        def d_max(s):
-            self.total_dist_calls += 1
-            furthest = np.where(s >= (b_min + b_max) / 2, b_min, b_max)
-            return np.linalg.norm(s - furthest)
+        furthest = np.where(seeds >= midpoint, b_min, b_max)
+        d_max_vals = np.linalg.norm(seeds - furthest, axis=1)
 
-        # Find the min of max distances
-        d_star_max = min(d_max(self.seeds[i]) for i in seed_indices)
+        # Keep distance call accounting comparable to the scalar version.
+        self.total_dist_calls += 2 * len(seed_indices)
 
-        # Lemma 1 filter: Reject seeds further than d*
-        return [i for i in seed_indices if d_min(self.seeds[i]) <= d_star_max]
+        # Find the min of max distances and apply Lemma 1 filter.
+        d_star_max = np.min(d_max_vals)
+        valid_idx = np.flatnonzero(d_min_vals <= d_star_max)
+        return [seed_indices[i] for i in valid_idx]
 
     def cci(self, P):
         """Cluster center initialization with density-based seeding."""
-        # Count points in bins and sort by density
-        bin_counts = {bid: len(indices) for bid, indices in self.bins.items()}
         # Use a list of (bin_id, count) to make tracking easier
-        sorted_bins = sorted(bin_counts.items(), key=lambda x: x[1], reverse=True)
+        sorted_bins = sorted(self.bin_counts.items(), key=lambda x: x[1], reverse=True)
 
         seed_list = []
-        chosen_bins = set()
 
         # Find local density peaks
         for bid, _count in sorted_bins:
-            if len(seed_list) < self.k:
-                seed_list.append(P[self.bins[bid]].mean(axis=0))
-                chosen_bins.add(bid)
-
-        # If the number of peak bins is less than k, select from remaining bins
-        if len(seed_list) < self.k:
-            remaining_bins = [bid for bid, count in sorted_bins if bid not in chosen_bins]
-            for bid in remaining_bins:
-                if len(seed_list) < self.k:
-                    seed_list.append(P[self.bins[bid]].mean(axis=0))
-                    chosen_bins.add(bid)
+            seed_list.append(self.bin_means[bid])
+            if len(seed_list) == self.k:
+                break
 
         # If k is still larger than non-empty bins, pad with random noise
         # This prevents the IndexError when k > number of non-empty bins
@@ -133,9 +132,9 @@ class QBCA:
 
         self.seeds = np.array(seed_list)
 
-    def cca(self, P):
-        """Cluster center assignment with early pruning."""
-        new_assignments = np.zeros(P.shape[0], dtype=int)
+    def cca(self):
+        """Cluster center assignment with early pruning at the bin level."""
+        bin_assignments = {}
         all_seed_indices = list(range(self.k))
 
         for _pid, pdata in self.parents.items():
@@ -143,23 +142,20 @@ class QBCA:
             parent_candidates = self._get_candidates(all_seed_indices, pdata['bounds'])
 
             for bid in pdata['children']:
-                indices = self.bins[bid]
                 # Child level inheritance
                 candidates = self._get_candidates(parent_candidates, self.bin_bounds[bid])
 
                 if len(candidates) == 1:
-                    # EARLY PRUNING: No point-level distance math needed
-                    new_assignments[indices] = candidates[0]
+                    # EARLY PRUNING: No distance math needed
+                    bin_assignments[bid] = candidates[0]
                 else:
-                    # Fallback to point-level assignment
-                    pts = P[indices]
-                    for idx_in_bin, p_idx in enumerate(indices):
-                        p = pts[idx_in_bin]
-                        dists = [np.linalg.norm(p - self.seeds[c]) for c in candidates]
-                        self.total_dist_calls += len(candidates)
-                        new_assignments[p_idx] = candidates[np.argmin(dists)]
+                    # Assignment based on the bin's representative mean
+                    p = self.bin_means[bid]
+                    dists = [np.linalg.norm(p - self.seeds[c]) for c in candidates]
+                    self.total_dist_calls += len(candidates)
+                    bin_assignments[bid] = candidates[np.argmin(dists)]
 
-        return new_assignments
+        return bin_assignments
 
     def dunn_index(self, P, assignments):
         """Quality measure for clustering (Dunn Index)."""
@@ -201,12 +197,19 @@ class QBCA:
         history = []
         for t in range(self.max_iter):
             old_seeds = self.seeds.copy()
-            assignments = self.cca(P)
+            bin_assignments = self.cca()
 
-            for h in range(self.k):
-                cluster_pts = P[assignments == h]
-                if len(cluster_pts) > 0:
-                    self.seeds[h] = cluster_pts.mean(axis=0)
+            # Single-pass accumulation over bins to avoid O(k * num_bins) rescans.
+            weight_sums = np.zeros((self.k, P.shape[1]), dtype=float)
+            cluster_weights = np.zeros(self.k, dtype=float)
+            for bid, cluster_id in bin_assignments.items():
+                weight = self.bin_counts[bid]
+                weight_sums[cluster_id] += self.bin_means[bid] * weight
+                cluster_weights[cluster_id] += weight
+
+            nonzero_clusters = cluster_weights > 0
+            updated_seeds = weight_sums[nonzero_clusters] / cluster_weights[nonzero_clusters, None]
+            self.seeds[nonzero_clusters] = updated_seeds
 
             # Calculates the shift for all centroids instantly
             shift = np.mean(np.sum((old_seeds - self.seeds)**2, axis=1))
@@ -216,7 +219,12 @@ class QBCA:
             if shift < self.threshold:
                 break
 
-        return assignments, self.seeds, history
+        # Map back to full point assignments
+        final_assignments = np.zeros(P.shape[0], dtype=int)
+        for bid, c in bin_assignments.items():
+            final_assignments[self.bins[bid]] = c
+
+        return final_assignments, self.seeds, history
 
     def get_metrics(self, P, assignments):
         """Calculate evaluation metrics for the QBCA clustering performance.
