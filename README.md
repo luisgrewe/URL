@@ -5,6 +5,18 @@
 1. **Clone the repository**:
    `git clone https://github.com/luisgrewe/URL.git`
 
+## Notebooks
+
+The experiments are implemented as three single-notebook pipelines (each notebook is self-contained). Figures are written under `images/` when you run them.
+
+| Notebook | What it does |
+| :--- | :--- |
+| **`main_analysis.ipynb`** | Core QBCA validation: a synthetic 2D Gaussian benchmark (G5-style blobs, k=5) with convergence plots and a short comparison to the paper’s reported metrics; then real datasets **Iris** (sklearn) and **Wine** (`data/wine.arff`) with Rand index and timing vs paper values. Outputs go to `images/main_analysis/`. |
+| **`image_segmentation.ipynb`** | Color image segmentation with QBCA on Lab pixels. Experiments are driven by `config/config_segmentation.json` (per-image settings from `skimage.data`). Applies Gaussian smoothing, clusters in Lab space, and saves segmentations and comparison panels to `images/image_segmentation/`. |
+| **`image_segmentation_vs_baseline.ipynb`** | Same config and Lab pipeline as above, but compares **QBCA** to a **KMeans** baseline (sklearn): side-by-side originals, QBCA (with Dunn index and timing), and KMeans (timing). Uses the paper-style 5×5 Gaussian kernel for smoothing. Outputs go to `images/image_segmentation_vs_baseline/`. |
+
+Use the project’s `.venv` (after `uv sync`) as the Jupyter kernel so imports resolve to the same dependencies as the CLI.
+
 ## Package Management with `uv`
 
 This project uses [uv](https://docs.astral.sh/uv/) for high-performance dependency management. Below are the essential commands to get the environment running.
