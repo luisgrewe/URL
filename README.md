@@ -1,102 +1,53 @@
-# URL
+<div align="center">
 
-## Getting Started
+# 🌌 QBCA
 
-1. **Clone the repository**:
-   `git clone https://github.com/luisgrewe/URL.git`
+**Quantization-Based Clustering Algorithm**
 
-## Notebooks
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/)
+[![Dependency Management: uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![Code Style: Flake8](https://img.shields.io/badge/code%20style-flake8-yellow.svg)](https://flake8.pycqa.org/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-F37626.svg?logo=Jupyter&logoColor=white)](https://jupyter.org/)
 
-The experiments are implemented as three single-notebook pipelines (each notebook is self-contained). Figures are written under `images/` when you run them.
+An efficient, hierarchical bin-pruning clustering algorithm tailored for high-performance image segmentation and clustering benchmarks.
 
-| Notebook | What it does |
-| :--- | :--- |
-| **`main_analysis.ipynb`** | Core QBCA validation: a synthetic 2D Gaussian benchmark (G5-style blobs, k=5) with convergence plots and a short comparison to the paper’s reported metrics; then real datasets **Iris** (sklearn) and **Wine** (`data/wine.arff`) with Rand index and timing vs paper values. Outputs go to `images/main_analysis/`. |
-| **`image_segmentation.ipynb`** | Color image segmentation with QBCA on Lab pixels. Experiments are driven by `config/config_segmentation.json` (per-image settings from `skimage.data`). Applies Gaussian smoothing, clusters in Lab space, and saves segmentations and comparison panels to `images/image_segmentation/`. |
-| **`image_segmentation_vs_baseline.ipynb`** | Same config and Lab pipeline as above, but compares **QBCA** to a **KMeans** baseline (sklearn): side-by-side originals, QBCA (with Dunn index and timing), and KMeans (timing). Uses the paper-style 5×5 Gaussian kernel for smoothing. Outputs go to `images/image_segmentation_vs_baseline/`. |
+[Getting Started](#-getting-started) •
+[Notebooks](#-notebooks--experiments) •
+[Development](#-development--linting)
 
-Use the project’s `.venv` (after `uv sync`) as the Jupyter kernel so imports resolve to the same dependencies as the CLI.
-
-## Package Management with `uv`
-
-This project uses [uv](https://docs.astral.sh/uv/) for high-performance dependency management. Below are the essential commands to get the environment running.
-
-### Installation
-If you don't have `uv` installed, run the following command for your OS:
-
-| Platform | Command |
-| :--- | :--- |
-| **macOS/Linux** | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| **Windows** | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
+</div>
 
 ---
 
-### Environment Setup
-Once `uv` is installed, navigate to the project root and run:
+## ✨ Features & Highlights
 
-```bash
-# Initialize the project, create .venv, and install dependencies
-uv sync
-```
-To activate your environment, run the following comand:
+The **QBCA** approach leverages intelligent hierarchical bin-pruning to massively reduce search space during clustering.
+T- 🚀 **Efficient Quantization:** Aggregates data points inT- 🚀 **Efficient Quantization:** Aggregead.
+- 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pies- 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Seonfig/           # Configuration files for image segmentation runs
+ ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structent ┣ 📂 data/     on
+ ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  �boo ┣ 📓 *.ipynb  ┣ 📓 *.ipynbect.toml    # Hig ┣ 📓 *.ipynb  ┣ �s man ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  �boo ┣ 📓 *.ipynb  ┣ 📓 *.ipynbect.toml    # Hig ┣ �t dependency tracking and virtual environment management.
 
-| Platform | Activation Command |
+### 1. Install `uv`
+Select the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect t
+### 3. Activate Environment
+> [!TIP]
+> **Jupyter Users:** Make sure to select the project's `.venv` as your Jupyter Kernel so your notebooks inherit the exact dependency tree as the CLI.
+
+| OS | Activation Command |
 | :--- | :--- |
 | **macOS / Linux** | `source .venv/bin/activate` |
-| **Windows (PowerShell)** | `.venv\Scripts\activate` |
+| **Windows** | `.venv\Scripts\activate` |
 
 ---
 
-### Testing Docstring
-```bash
-uv run flake8 qbca.py --config .flake8 || uv run python -m flake8 qbca.py --config .flake8
-```
+## 🧪 Notebooks & Experiments
 
-## Linting (Flake8 via uv)
+The experiments act as self-contained end-to-end pipelines. Output plots are stored seamlessly within the `images/` directory.
 
-- Install linters into the `uv` environment:
-```bash
-uv add flake8 flake8-docstrings flake8-bugbear
-```
+| Notebook | Description | Outputs || Notebook | Descr------- | :------ |
+| 📓 **`main_analysis.ipynb`** | **Core validation.** Benchmarks synthetic 2D G5-style Gaussians (k=5) and evaluates convergence on **Iris** (sklearn) and **Wine** (`data/wine.arff`). Measures timing vs. iterations and Rand Index. | 📁 `images/main_analysis/` |
+| 🎨 **`image_segmentation.ipynb`** | **Color Image Segmentation.** Driven by `config_segmentation.json`. Smooths elements with Gaussians, applies Lab transformations, clusters using QBCA.| 🎨 **`image_segmentatientation/` | 🎨 **`image_segmentation.ipynb`** | **Color Image Segmentation.** Driven by `config_segmentation.json`. Smooths elements with Gaussians, ale execut| 🎨 **`image_segmentat, a| 🎨 **ndex metrics. | 📁 `images/image_segmentation_vs_baseline| 🎨 **`image_segmentation.it & Linting
 
-- Run Flake8 for the whole repo (uses `.flake8`):
-```bash
-uv run flake8 --config .flake8
-```
-
-- Run Flake8 for a single file:
-```bash
-uv run flake8 qbca.py --config .flake8
-```
-
-- Run the flake8 binary directly from the venv (if needed):
-```bash
-.venv/bin/flake8 --config .flake8
-```
-
-- VS Code visual linting: select the project interpreter (Command Palette → `Python: Select Interpreter` → choose the `.venv`), reload the window, then open files — Problems panel and editor squiggles will show Flake8 findings.
-
-Notes:
-- The repo-level `.flake8` controls rules such as blank-line enforcement and docstring checks.
-- To suppress a specific check for a file temporarily, use a `# noqa: CODE` comment or add a `per-file-ignores` entry in `.flake8`.
-
-### Linting notebooks (ipynb)
-
-- Install `nbqa` into the `uv` environment:
-```bash
-uv add nbqa
-```
-
-- Run Flake8 on a notebook (checks code cells using your `.flake8`):
-```bash
-uv run nbqa flake8 main_analysis.ipynb --config .flake8
-```
-
-- Autoformat or fixable issues: run an autoformatter via `nbqa`, for example:
-```bash
-uv run nbqa autopep8 path/to/notebook.ipynb --in-place
-```
-
-Notes:
-- `nbqa` applies tools to code cells only and preserves notebook structure.
-- You can use the same `.flake8` config for notebooks and .py files to keep rules consistent.
+Code standard practices are enforced thCode standard practices are enforced thCode standard practices are enforced thCode standard practices are enfs>
+<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumal<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumal<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumlt with ❤️ for High-Performance Clustering.</sub>
+</div>
