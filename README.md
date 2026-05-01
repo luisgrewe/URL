@@ -11,9 +11,7 @@
 
 An efficient, hierarchical bin-pruning clustering algorithm tailored for high-performance image segmentation and clustering benchmarks.
 
-[Getting Started](#-getting-started) •
-[Notebooks](#-notebooks--experiments) •
-[Development](#-development--linting)
+[Getting Started](#-getting-started) • [Notebooks](#-notebooks--experiments) • [Development](#-development--linting)
 
 </div>
 
@@ -22,21 +20,57 @@ An efficient, hierarchical bin-pruning clustering algorithm tailored for high-pe
 ## ✨ Features & Highlights
 
 The **QBCA** approach leverages intelligent hierarchical bin-pruning to massively reduce search space during clustering.
-T- 🚀 **Efficient Quantization:** Aggregates data points inT- 🚀 **Efficient Quantization:** Aggregead.
-- 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pies- 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively - 🎨 **Image Seonfig/           # Configuration files for image segmentation runs
- ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structured datasets ┣ 📂 data/             # Structent ┣ 📂 data/     on
- ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  �boo ┣ 📓 *.ipynb  ┣ 📓 *.ipynbect.toml    # Hig ┣ 📓 *.ipynb  ┣ �s man ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  ┣ 📓 *.ipynb  �boo ┣ 📓 *.ipynb  ┣ 📓 *.ipynbect.toml    # Hig ┣ �t dependency tracking and virtual environment management.
 
-### 1. Install `uv`
-Select the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect the command for your opeSelect t
-### 3. Activate Environment
+- 🚀 **Efficient Quantization:** Aggregates data points into bins to iteratively reduce search overhead.
+- 🎨 **Image Segmentation:** Applies Gaussian smoothing and clusters image pixels natively in the `Lab` color space.
+- 📊 **Robust Benchmarking:** Direct comparisons against `KMeans` capturing structural validity (Dunn Index, Rand Index) and exact execution times.
+
+---
+
+## 📂 Architecture
+
+```text
+📦 URL
+ ┣ 📂 config/           # Configuration files for image segmentation runs
+ ┣ 📂 data/             # Structured datasets (e.g., wine.arff)
+ ┣ 📂 images/           # Generated output figures and benchmarks
+ ┣ 📜 qbca.py           # Core Object-Oriented QBCA Implementation
+ ┣ 📓 *.ipynb           # Self-contained Jupyter Notebooks for experiments
+ ┗ 📜 pyproject.toml    # High-performance dependencies managed via uv
+```
+
+---
+
+## 🚀 Getting Started
+
+This repository uses [uv](https://docs.astral.sh/uv/) for incredibly fast dependency tracking and virtual environment management.
+
+### 1️⃣ Install `uv`
+
+Select the command for your operating system:
+
+| Platform | Command |
+| :--- | :--- |
+| **macOS / Linux** | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| **Windows** | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
+
+### 2️⃣ Clone & Sync
+
+```bash
+git clone https://github.com/luisgrewe/URL.git
+cd URL
+uv sync
+```
+
+### 3️⃣ Activate Environment
+
 > [!TIP]
-> **Jupyter Users:** Make sure to select the project's `.venv` as your Jupyter Kernel so your notebooks inherit the exact dependency tree as the CLI.
+> **Jupyter Users:** Select the project's `.venv` as your Jupyter Kernel to inherit the exact dependency tree as the CLI.
 
-| OS | Activation Command |
+| OS | Command |
 | :--- | :--- |
 | **macOS / Linux** | `source .venv/bin/activate` |
-| **Windows** | `.venv\Scripts\activate` |
+| **Windows (PowerShell)** | `.venv\Scripts\activate` |
 
 ---
 
@@ -44,10 +78,41 @@ Select the command for your opeSelect the command for your opeSelect the command
 
 The experiments act as self-contained end-to-end pipelines. Output plots are stored seamlessly within the `images/` directory.
 
-| Notebook | Description | Outputs || Notebook | Descr------- | :------ |
-| 📓 **`main_analysis.ipynb`** | **Core validation.** Benchmarks synthetic 2D G5-style Gaussians (k=5) and evaluates convergence on **Iris** (sklearn) and **Wine** (`data/wine.arff`). Measures timing vs. iterations and Rand Index. | 📁 `images/main_analysis/` |
-| 🎨 **`image_segmentation.ipynb`** | **Color Image Segmentation.** Driven by `config_segmentation.json`. Smooths elements with Gaussians, applies Lab transformations, clusters using QBCA.| 🎨 **`image_segmentatientation/` | 🎨 **`image_segmentation.ipynb`** | **Color Image Segmentation.** Driven by `config_segmentation.json`. Smooths elements with Gaussians, ale execut| 🎨 **`image_segmentat, a| 🎨 **ndex metrics. | 📁 `images/image_segmentation_vs_baseline| 🎨 **`image_segmentation.it & Linting
+| Notebook | Description | Output Directory |
+| :------- | :---------- | :------ |
+| 📓 **`main_analysis.ipynb`** | Core validation. Benchmarks synthetic 2D G5-style Gaussians (k=5) with convergence plots. Evaluates on **Iris** and **Wine** datasets with Rand Index metrics. | 📁 `images/main_analysis/` |
+| 🎨 **`image_segmentation.ipynb`** | Color image segmentation driven by `config_segmentation.json`. Applies Gaussian smoothing, Lab transformations, and QBCA clustering. | 📁 `images/image_segmentation/` |
+| ⚔️ **`image_segmentation_vs_baseline.ipynb`** | Head-to-head QBCA vs KMeans comparison. Shows execution times, visual results, and Dunn Index metrics side-by-side. | 📁 `images/image_segmentation_vs_baseline/` |
 
-Code standard practices are enforced thCode standard practices are enforced thCode standard practices are enforced thCode standard practices are enfs>
-<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumal<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumal<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<summarypy<summary><b>Clic<summary><b>Clic<summary><b>Clic<summary><b>Clic<sumlt with ❤️ for High-Performance Clustering.</sub>
+---
+
+## 🛠 Development & Linting
+
+Code quality is enforced through **Flake8** and **nbqa**. All linting tools are managed within your `uv` environment.
+
+<details>
+<summary><b>📋 Python & Notebook Linting Commands</b></summary>
+
+### Python Code Analysis (`.py`)
+```bash
+# Lint the entire repository
+uv run flake8 --config .flake8
+
+# Lint a specific file
+uv run flake8 qbca.py --config .flake8
+```
+
+### Notebook Analysis (`.ipynb`)
+```bash
+# Check notebook code cells
+uv run nbqa flake8 main_analysis.ipynb --config .flake8
+
+# Auto-format issues inside a notebook
+uv run nbqa autopep8 main_analysis.ipynb --in-place
+```
+
+> **VS Code Integration:** Command Palette → `Python: Select Interpreter` → choose `.venv`. Reload window to see Flake8 findings in real-time.
+
+</details>
+
 </div>
